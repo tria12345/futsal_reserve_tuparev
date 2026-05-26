@@ -1,0 +1,13 @@
+{
+  "name": "futsal-websocket-server",
+  "version": "1.0.0",
+  "description": "Real-time updates server for Futsal Reserve Tuparev",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
