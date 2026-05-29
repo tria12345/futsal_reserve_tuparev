@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "128187728546",
+    "project_id": "futsal-reserve-tuparev",
+    "storage_bucket": "futsal-reserve-tuparev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128187728546:android:c8db35668b0b2bde57cdfb",
+        "android_client_info": {
+          "package_name": "com.example.futsal_reserve_tuparev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128187728546-7qo63ev7eoses20g0b8tg08n0urvq05n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.futsal_reserve_tuparev",
+            "certificate_hash": "c3375dbb5a3c50ab6cf8baf7edfd47aaf08d2de2"
+          }
+        },
+        {
+          "client_id": "128187728546-forjajvr3a0d7iovncd1crj3df5a12rb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0lgmmtO2bekrmU8b4Q17aWQ1gvba7pvo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "128187728546-forjajvr3a0d7iovncd1crj3df5a12rb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "128187728546-87r2lf9lm1f3c871nbnid61v5tmafmnt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.futsalReserveTuparev"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
