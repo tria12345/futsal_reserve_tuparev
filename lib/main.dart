@@ -59,6 +59,7 @@ class MyApp extends StatelessWidget {
 
           return MaterialApp(
             title: 'Futsal Reserve Tuparev',
+            navigatorKey: FcmService.navigatorKey, // Handle global deep-link on notification tap
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             home: defaultHome,

@@ -10,7 +10,8 @@ import '../login_screen.dart';
 import 'court_detail_screen.dart';
 
 class CustomerDashboard extends StatefulWidget {
-  const CustomerDashboard({super.key});
+  final int initialTab;
+  const CustomerDashboard({super.key, this.initialTab = 0});
 
   @override
   State<CustomerDashboard> createState() => _CustomerDashboardState();
@@ -18,12 +19,13 @@ class CustomerDashboard extends StatefulWidget {
 
 class _CustomerDashboardState extends State<CustomerDashboard> {
   late DateTime _selectedDate;
-  int _activeTab = 0; // 0: Booking Lobby, 1: Booking History
+  late int _activeTab; // 0: Booking Lobby, 1: Booking History
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+    _activeTab = widget.initialTab;
     
     // Fetch courts and history on startup
     WidgetsBinding.instance.addPostFrameCallback((_) {
