@@ -1,12 +1,10 @@
-// lib/services/fcm_service.dart
-// Firebase Cloud Messaging Service (Modul 16)
-// Handles push notifications from server → device via FCM
-
 import 'dart:convert';
 import 'dart:developer' as dev;
+import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
+import '../views/customer/customer_dashboard.dart';
 import 'notification_service.dart';
 
 /// Top-level background message handler (must be a top-level function, not a class method)
@@ -20,6 +18,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class FcmService {
+  // Global Navigator Key for context-less navigation on notification tap
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   // Singleton pattern (same as NotificationService & SocketService)
   static final FcmService _instance = FcmService._internal();
   factory FcmService() => _instance;
@@ -83,13 +84,14 @@ class FcmService {
     // 5. Handle notification tap when app was in background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       dev.log("FCM: Notification tapped (app was in background): ${message.data}");
-      // Navigation logic can be added here based on message.data
+      _handleNotificationTap(message);
     });
 
     // 6. Check if app was launched from a terminated state via notification
     final RemoteMessage? initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
       dev.log("FCM: App launched from terminated state via notification: ${initialMessage.data}");
+      _handleNotificationTap(initialMessage);
     }
 
     _isInitialized = true;
@@ -122,5 +124,16 @@ class FcmService {
     } catch (e) {
       dev.log("FCM Token registration error: $e");
     }
+  }
+
+  /// Handle notification tap by navigating to the customer booking history screen
+  void _handleNotificationTap(RemoteMessage message) {
+    dev.log("FcmService: Handling notification tap. Deep-linking to Customer Dashboard History Tab...");
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => const CustomerDashboard(initialTab: 1),
+      ),
+      (route) => false,
+    );
   }
 }

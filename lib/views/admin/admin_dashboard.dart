@@ -441,60 +441,70 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                       side: BorderSide(color: Colors.grey.shade200, width: 0.8),
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundColor: AppTheme.primaryGlow,
-                                          child: const Icon(Icons.sports_soccer, color: AppTheme.primary),
-                                        ),
-                                        title: Text(
-                                          "${booking.fieldName} - ${booking.teamName}",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold, 
-                                            color: AppTheme.textPrimary,
+                                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: AppTheme.primaryGlow,
+                                            child: const Icon(Icons.sports_soccer, color: AppTheme.primary),
                                           ),
-                                        ),
-                                        subtitle: Padding(
-                                          padding: const EdgeInsets.only(top: 4.0),
-                                          child: Text(
-                                            "Tanggal Pemesanan: ${booking.bookDate}\nWaktu Sewa: ${booking.timeSlotString}",
-                                            style: const TextStyle(
-                                              fontSize: 11, 
-                                              color: AppTheme.textSecondary,
-                                              height: 1.3,
+                                          const SizedBox(width: 14),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${booking.fieldName} - ${booking.teamName}",
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold, 
+                                                    color: AppTheme.textPrimary,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  "Tanggal Pemesanan: ${booking.bookDate}\nWaktu Sewa: ${booking.timeSlotString}",
+                                                  style: const TextStyle(
+                                                    fontSize: 11, 
+                                                    color: AppTheme.textSecondary,
+                                                    height: 1.3,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ),
-                                        trailing: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              "Rp ${booking.totalPrice.toInt()}",
-                                              style: const TextStyle(
-                                                color: AppTheme.textPrimary, 
-                                                fontWeight: FontWeight.bold, 
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: stBg,
-                                                borderRadius: BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                statusText.toUpperCase(),
-                                                style: TextStyle(
-                                                  color: stColor, 
-                                                  fontSize: 9, 
-                                                  fontWeight: FontWeight.bold,
+                                          const SizedBox(width: 8),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "Rp ${booking.totalPrice.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => "${m[1]}.")}",
+                                                style: const TextStyle(
+                                                  color: AppTheme.textPrimary, 
+                                                  fontWeight: FontWeight.bold, 
+                                                  fontSize: 14,
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
+                                              const SizedBox(height: 6),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: stBg,
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  statusText.toUpperCase(),
+                                                  style: TextStyle(
+                                                    color: stColor, 
+                                                    fontSize: 9, 
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   );

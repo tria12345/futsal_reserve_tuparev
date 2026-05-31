@@ -1,6 +1,12 @@
 // lib/services/notification_service.dart
 
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'fcm_service.dart';
+import '../views/customer/customer_dashboard.dart';
+import '../views/admin/admin_dashboard.dart';
 
 class NotificationService {
   // Singleton pattern
@@ -33,8 +39,40 @@ class NotificationService {
 
     await _notificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Handle notification click action
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        // Handle local notification click action
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          final userJson = prefs.getString('user_profile');
+          if (userJson != null) {
+            final userData = json.decode(userJson);
+            final String role = userData['role'] ?? 'customer';
+            
+            if (role == 'admin') {
+              FcmService.navigatorKey.currentState?.pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const AdminDashboard(),
+                ),
+                (route) => false,
+              );
+            } else {
+              FcmService.navigatorKey.currentState?.pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const CustomerDashboard(initialTab: 1),
+                ),
+                (route) => false,
+              );
+            }
+          }
+        } catch (e) {
+          // Fallback to customer history
+          FcmService.navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => const CustomerDashboard(initialTab: 1),
+            ),
+            (route) => false,
+          );
+        }
       },
     );
 
