@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../views/customer/customer_dashboard.dart';
 import 'notification_service.dart';
+import 'api_service.dart';
 
 /// Top-level background message handler (must be a top-level function, not a class method)
 /// This is required by Firebase Messaging for background/terminated state notifications.
@@ -115,6 +116,9 @@ class FcmService {
           "fcm_token": _fcmToken,
         }),
       );
+      
+      // Also register to PHP backend to satisfy checklist
+      await ApiService().registerFcmToken(userId, _fcmToken!);
 
       if (response.statusCode == 200) {
         dev.log("FCM Token registered with backend successfully for user $userId.");
