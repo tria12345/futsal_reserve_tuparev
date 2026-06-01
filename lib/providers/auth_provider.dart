@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import '../config/app_config.dart';
 import '../models/user_model.dart';
 import '../services/socket_service.dart';
 import '../services/fcm_service.dart';

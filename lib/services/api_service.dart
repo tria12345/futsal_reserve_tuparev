@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
-import 'dart:developer' as dev;
 
 class ApiService {
   // Singleton pattern

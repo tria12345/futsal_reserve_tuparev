@@ -3,8 +3,6 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../config/app_config.dart';
 import '../models/field_model.dart';
 import '../services/api_service.dart';
 
