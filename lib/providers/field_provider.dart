@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../models/field_model.dart';
+import '../services/api_service.dart';
 
 class FieldProvider extends ChangeNotifier {
   List<FieldModel> _fields = [];
@@ -23,10 +24,7 @@ class FieldProvider extends ChangeNotifier {
     // We notify listeners later to avoid building errors or trigger loading screens
     
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/fields.php${isCustomer ? '?customer=true' : ''}");
-      dev.log("Fetching courts from: $url");
-      
-      final response = await http.get(url);
+      final response = await ApiService().getFields(isCustomer: isCustomer);
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['status'] == 'success') {
@@ -53,17 +51,12 @@ class FieldProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/fields.php");
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "name": name,
-          "price_per_hour": price,
-          "description": description,
-          "image_url": imageUrl
-        }),
-      );
+      final response = await ApiService().addField({
+        "name": name,
+        "price_per_hour": price,
+        "description": description,
+        "image_url": imageUrl
+      });
 
       final responseData = json.decode(response.body);
 
@@ -93,15 +86,7 @@ class FieldProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/fields.php");
-      final response = await http.put(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "id": id,
-          "is_maintenance": isMaintenance
-        }),
-      );
+      final response = await ApiService().toggleMaintenance(id, isMaintenance);
 
       final responseData = json.decode(response.body);
 
@@ -141,8 +126,7 @@ class FieldProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/fields.php?id=$id");
-      final response = await http.delete(url);
+      final response = await ApiService().deleteField(id);
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['status'] == 'success') {

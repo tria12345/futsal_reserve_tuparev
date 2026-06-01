@@ -11,6 +11,7 @@ import '../config/app_config.dart';
 import '../models/user_model.dart';
 import '../services/socket_service.dart';
 import '../services/fcm_service.dart';
+import '../services/api_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   UserModel? _currentUser;
@@ -90,18 +91,14 @@ class AuthProvider extends ChangeNotifier {
       dev.log("Firebase Auth success! UID: ${userCredential.user!.uid}. Verifying with backend...");
       // ===== END FIREBASE AUTH =====
 
-      // Call PHP Auth Endpoint with Firebase ID Token
-      final response = await http.post(
-        Uri.parse("${AppConfig.baseUrl}/auth.php"),
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "email": googleUser.email,
-          "name": googleUser.displayName ?? "Futsal Player",
-          "google_id": googleUser.id,
-          "avatar": googleUser.photoUrl,
-          "id_token": firebaseIdToken // Firebase ID Token sent to PHP backend for verification
-        }),
-      );
+      // Call PHP Auth Endpoint with Firebase ID Token via ApiService
+      final response = await ApiService().login({
+        "email": googleUser.email,
+        "name": googleUser.displayName ?? "Futsal Player",
+        "google_id": googleUser.id,
+        "avatar": googleUser.photoUrl,
+        "id_token": firebaseIdToken 
+      });
 
       final responseData = json.decode(response.body);
 

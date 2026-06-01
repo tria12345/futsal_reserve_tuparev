@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../models/booking_model.dart';
 import '../services/socket_service.dart';
+import '../services/api_service.dart';
 
 class BookingProvider extends ChangeNotifier {
   List<BookingModel> _bookings = [];
@@ -33,10 +34,9 @@ class BookingProvider extends ChangeNotifier {
     _errorMessage = null;
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/bookings.php?field_id=$fieldId&book_date=$date");
-      dev.log("Fetching booked slots from: $url");
+      dev.log("Fetching booked slots for court $fieldId on date $date");
       
-      final response = await http.get(url);
+      final response = await ApiService().getUnavailableSlots(fieldId, date);
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['status'] == 'success') {
@@ -60,8 +60,7 @@ class BookingProvider extends ChangeNotifier {
     _errorMessage = null;
 
     try {
-      final urlString = "${AppConfig.baseUrl}/bookings.php${userId != null ? "?user_id=$userId" : ""}";
-      final response = await http.get(Uri.parse(urlString));
+      final response = await ApiService().getBookings(userId: userId);
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['status'] == 'success') {
@@ -97,7 +96,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/bookings.php");
+      final url = Uri.parse("${AppConfig.baseUrl}/tambah_booking.php");
       dev.log("Creating reservation order via multipart POST to: $url");
       
       final request = http.MultipartRequest("POST", url);
@@ -120,8 +119,7 @@ class BookingProvider extends ChangeNotifier {
       );
       request.files.add(multipartFile);
 
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = await ApiService().createBooking(request);
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 201 && responseData['status'] == 'success') {
@@ -155,15 +153,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/verify.php");
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "booking_id": bookingId,
-          "status": status
-        }),
-      );
+      final response = await ApiService().verifyBooking(bookingId, status);
 
       final responseData = json.decode(response.body);
 
@@ -224,14 +214,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final url = Uri.parse("${AppConfig.baseUrl}/checkin.php");
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          "booking_id": bookingId
-        }),
-      );
+      final response = await ApiService().checkInBooking(bookingId);
 
       final responseData = json.decode(response.body);
 
