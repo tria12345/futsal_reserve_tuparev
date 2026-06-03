@@ -98,18 +98,27 @@ class AuthProvider extends ChangeNotifier {
         "id_token": firebaseIdToken 
       });
 
-      final responseData = json.decode(response.body);
+      return await _handleBackendAuthResponse(response);
+    } catch (e) {
+      _errorMessage = "Authentication failed: $e";
+      dev.log("Auth Exception: $e");
+    }
 
+    _setLoading(false);
+    return false;
+  }
+
+  // Common backend response handler
+  Future<bool> _handleBackendAuthResponse(dynamic response) async {
+    try {
+      final responseData = json.decode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseData['status'] == 'success') {
           _currentUser = UserModel.fromJson(responseData['data']);
           await _saveSession(_currentUser!);
           
-          // Connect real-time socket and join relevant room
           SocketService().connect();
           SocketService().joinRoom(_currentUser!.isAdmin ? "admins" : "customers");
-          
-          // Register FCM token with backend for push notifications (Modul 16)
           FcmService().registerToken(userId: _currentUser!.id);
 
           _setLoading(false);
@@ -121,13 +130,91 @@ class AuthProvider extends ChangeNotifier {
         _errorMessage = responseData['message'] ?? "Server error: ${response.statusCode}";
       }
     } catch (e) {
-      _errorMessage = "Authentication failed: $e";
-      dev.log("Auth Exception: $e");
+      _errorMessage = "Failed to parse server response";
+      dev.log("Parse Error: $e");
     }
-
     _setLoading(false);
     return false;
   }
+
+  // ===== EMAIL/PASSWORD AUTHENTICATION =====
+  Future<bool> registerWithEmail(String email, String password, String name) async {
+    _setLoading(true);
+    _clearError();
+    try {
+      dev.log("Initiating Firebase Email Registration...");
+      final UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      
+      final String? firebaseIdToken = await userCredential.user!.getIdToken();
+      
+      final response = await ApiService().login({
+        "email": email.trim(),
+        "name": name.trim(),
+        "google_id": userCredential.user!.uid, // Use Firebase UID as fallback
+        "avatar": "https://api.dicebear.com/7.x/adventurer/svg?seed=${Uri.encodeComponent(name.trim())}",
+        "id_token": firebaseIdToken 
+      });
+
+      return await _handleBackendAuthResponse(response);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        _errorMessage = 'Password terlalu lemah.';
+      } else if (e.code == 'email-already-in-use') {
+        _errorMessage = 'Email sudah terdaftar.';
+      } else {
+        _errorMessage = e.message ?? "Registrasi gagal";
+      }
+      dev.log("Firebase Auth Exception: $e");
+    } catch (e) {
+      _errorMessage = "Registrasi gagal: $e";
+      dev.log("Auth Exception: $e");
+    }
+    
+    _setLoading(false);
+    return false;
+  }
+
+  Future<bool> signInWithEmail(String email, String password) async {
+    _setLoading(true);
+    _clearError();
+    try {
+      dev.log("Initiating Firebase Email Sign-In...");
+      final UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      
+      final String? firebaseIdToken = await userCredential.user!.getIdToken();
+      
+      final response = await ApiService().login({
+        "email": email.trim(),
+        "name": email.split('@')[0], // Fallback name
+        "google_id": userCredential.user!.uid,
+        "id_token": firebaseIdToken 
+      });
+
+      return await _handleBackendAuthResponse(response);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+        _errorMessage = 'Email atau password salah.';
+      } else if (e.code == 'wrong-password') {
+        _errorMessage = 'Email atau password salah.';
+      } else {
+        _errorMessage = e.message ?? "Login gagal";
+      }
+      dev.log("Firebase Auth Exception: $e");
+    } catch (e) {
+      _errorMessage = "Login gagal: $e";
+      dev.log("Auth Exception: $e");
+    }
+    
+    _setLoading(false);
+    return false;
+  }
+  // ===== END EMAIL/PASSWORD AUTHENTICATION =====
 
   // Save session details locally
   Future<void> _saveSession(UserModel user) async {
