@@ -13,6 +13,11 @@ class AppTheme {
   static const Color textPrimary = Color(0xFF0F172A); // Ultra-Dark Charcoal Slate
   static const Color textSecondary = Color(0xFF64748B); // Slate Medium Grey
 
+  static const Color backgroundDark = Color(0xFF0F172A); // Deep slate/navy background
+  static const Color cardColorDark = Color(0xFF1E293B); // Slate grey card
+  static const Color textPrimaryDark = Color(0xFFF8FAFC); // Crisp off-white text
+  static const Color textSecondaryDark = Color(0xFF94A3B8); // Slate Light Grey
+
   // Premium Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF10B981), Color(0xFF059669)],
@@ -88,6 +93,62 @@ class AppTheme {
       ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: Color(0xFF1E293B),
+        contentTextStyle: TextStyle(color: Colors.white),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // Material 3 Dark Theme Config (iOS-like Dark Mode)
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: backgroundDark,
+      primaryColor: primary,
+      colorScheme: const ColorScheme.dark(
+        primary: primary,
+        secondary: secondary,
+        surface: cardColorDark,
+        error: accent,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: cardColorDark,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: cardColorDark,
+        elevation: 1,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade800, width: 0.8),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+          elevation: 0,
+        ),
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: cardColorDark,
         contentTextStyle: TextStyle(color: Colors.white),
         behavior: SnackBarBehavior.floating,
       ),
