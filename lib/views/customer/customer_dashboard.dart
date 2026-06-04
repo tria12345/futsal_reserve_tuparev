@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/field_provider.dart';
 import '../../providers/booking_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../theme/app_theme.dart';
 import '../login_screen.dart';
 import 'court_detail_screen.dart';
@@ -20,6 +22,7 @@ class CustomerDashboard extends StatefulWidget {
 class _CustomerDashboardState extends State<CustomerDashboard> {
   late DateTime _selectedDate;
   late int _activeTab; // 0: Booking Lobby, 1: Booking History
+  int _bottomNavIndex = 0; // 0: Beranda (Booking Lobby/History), 1: Pengaturan
 
   @override
   void initState() {
@@ -46,192 +49,218 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     final auth = context.watch<AuthProvider>();
     final fieldProv = context.watch<FieldProvider>();
     final bookingProv = context.watch<BookingProvider>();
+    final themeProv = context.watch<ThemeProvider>();
     final user = auth.currentUser;
+    final isDark = themeProv.isDarkMode;
 
     if (user == null) {
       return const LoginScreen();
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.background,
       appBar: AppBar(
-        title: const Text(
-          "Futsal Reserve Tuparev",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+        title: Text(
+          _bottomNavIndex == 0 ? "Futsal Reserve Tuparev" : "Pengaturan",
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: AppTheme.primary,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            tooltip: "Keluar",
-            onPressed: () async {
-              await auth.logout();
-              if (!context.mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
-          ),
-        ],
+        centerTitle: true,
       ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
-          child: Column(
-            children: [
-          // User greeting banner (Clean, professional look)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 16.0),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey.shade200, width: 2),
-                  ),
-                  child: CircleAvatar(
-                    radius: 26,
-                    backgroundColor: Colors.white,
-                    backgroundImage: NetworkImage(
-                      user.avatar ?? "https://api.dicebear.com/7.x/adventurer/svg?seed=${user.name}",
+          child: _bottomNavIndex == 0
+              ? Column(
+                  children: [
+                    // User greeting banner (Clean, professional look)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 16.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade200, width: 2),
+                            ),
+                            child: CircleAvatar(
+                              radius: 26,
+                              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                              backgroundImage: NetworkImage(
+                                user.avatar ?? "https://api.dicebear.com/7.x/adventurer/svg?seed=${user.name}",
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Halo, ${user.name}!",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: isDark ? Colors.white : AppTheme.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  "Siap menaklukkan lapangan hari ini?",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Halo, ${user.name}!",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      const Text(
-                        "Siap menaklukkan lapangan hari ini?",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppTheme.textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
 
-          // Tab Buttons (Beautiful commercial segmented selector)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () => setState(() => _activeTab = 0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    // Tab Buttons (Beautiful commercial segmented selector)
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: _activeTab == 0 ? Colors.white : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: _activeTab == 0
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]
-                            : null,
+                        color: isDark ? const Color(0xFF1E293B) : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text(
-                        "Sewa Lapangan",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
-                          fontSize: 14,
-                        ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() => _activeTab = 0),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: _activeTab == 0 ? (isDark ? const Color(0xFF334155) : Colors.white) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: _activeTab == 0
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.05),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ]
+                                      : null,
+                                ),
+                                child: Text(
+                                  "Sewa Lapangan",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: _activeTab == 0 ? AppTheme.primary : (isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                setState(() => _activeTab = 1);
+                                bookingProv.fetchBookings(userId: user.id);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: _activeTab == 1 ? (isDark ? const Color(0xFF334155) : Colors.white) : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: _activeTab == 1
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.05),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ]
+                                      : null,
+                                ),
+                                child: Text(
+                                  "Riwayat Sewa Saya",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: _activeTab == 1 ? AppTheme.primary : (isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      setState(() => _activeTab = 1);
-                      bookingProv.fetchBookings(userId: user.id);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _activeTab == 1 ? Colors.white : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: _activeTab == 1
-                            ? [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: const Text(
-                        "Riwayat Sewa Saya",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-          // Display Active Tab
-          Expanded(
-            child: _activeTab == 0
-                ? _buildLobbyTab(fieldProv)
-                : _buildHistoryTab(bookingProv),
-          ),
-        ],
+                    // Display Active Tab
+                    Expanded(
+                      child: _activeTab == 0
+                          ? _buildLobbyTab(fieldProv, isDark)
+                          : _buildHistoryTab(bookingProv, isDark),
+                    ),
+                  ],
+                )
+              : _buildSettingsTab(user, auth, isDark),
+        ),
       ),
-    ),
-  ),
-);
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: isDark ? const Color(0xFF334155) : Colors.grey.shade200,
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _bottomNavIndex,
+          onTap: (index) {
+            setState(() {
+              _bottomNavIndex = index;
+            });
+          },
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          selectedItemColor: AppTheme.primary,
+          unselectedItemColor: isDark ? const Color(0xFF64748B) : Colors.grey.shade400,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+          unselectedLabelStyle: const TextStyle(fontSize: 11),
+          elevation: 8,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.sports_soccer_rounded),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings_rounded),
+              label: 'Pengaturan',
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buildLobbyTab(FieldProvider fieldProv) {
+  Widget _buildLobbyTab(FieldProvider fieldProv, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Horizontal calendar picker
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             "Pilih Tanggal",
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              color: isDark ? Colors.white : AppTheme.textPrimary,
             ),
           ),
         ),
@@ -260,10 +289,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   width: 58,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.primary : Colors.white,
+                    color: isSelected ? AppTheme.primary : (isDark ? const Color(0xFF1E293B) : Colors.white),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected ? AppTheme.primary : Colors.grey.shade200,
+                      color: isSelected ? AppTheme.primary : (isDark ? const Color(0xFF334155) : Colors.grey.shade200),
                     ),
                     boxShadow: isSelected ? AppTheme.softShadow() : null,
                   ),
@@ -275,7 +304,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: isSelected ? Colors.white70 : AppTheme.textSecondary,
+                          color: isSelected ? Colors.white70 : (isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -284,7 +313,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: isSelected ? Colors.white : AppTheme.textPrimary,
+                          color: isSelected ? Colors.white : (isDark ? Colors.white : AppTheme.textPrimary),
                         ),
                       ),
                     ],
@@ -296,14 +325,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
         ),
         const SizedBox(height: 20),
 
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             "Lapangan Futsal Tersedia",
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: AppTheme.textPrimary,
+              color: isDark ? Colors.white : AppTheme.textPrimary,
             ),
           ),
         ),
@@ -333,12 +362,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.grey.shade200, width: 0.8),
+                                border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade200, width: 0.8),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.03),
+                                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
                                     blurRadius: 8,
                                     offset: const Offset(0, 3),
                                   )
@@ -366,7 +395,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                         fit: BoxFit.cover,
                                         errorBuilder: (c, e, s) => Container(
                                           height: 140,
-                                          color: Colors.grey.shade100,
+                                          color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
                                           child: const Icon(Icons.sports_soccer, size: 48, color: Colors.grey),
                                         ),
                                       ),
@@ -381,16 +410,16 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                                 children: [
                                                   Text(
                                                     court.name,
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
-                                                      color: AppTheme.textPrimary,
+                                                      color: isDark ? Colors.white : AppTheme.textPrimary,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Text(
                                                     "${_getFieldSpecs(court.name)['floor']} • ${_getFieldSpecs(court.name)['position']}",
-                                                    style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                                    style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
                                                   ),
                                                 ],
                                               ),
@@ -399,7 +428,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                               decoration: BoxDecoration(
-                                                color: AppTheme.primaryGlow,
+                                                color: isDark ? const Color(0xFF0F172A) : AppTheme.primaryGlow,
                                                 borderRadius: BorderRadius.circular(10),
                                                 border: Border.all(color: AppTheme.primary.withValues(alpha: 0.15)),
                                               ),
@@ -427,7 +456,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
-  Widget _buildHistoryTab(BookingProvider bookingProv) {
+  Widget _buildHistoryTab(BookingProvider bookingProv, bool isDark) {
     return RefreshIndicator(
       onRefresh: () async {
         final user = context.read<AuthProvider>().currentUser;
@@ -458,12 +487,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200, width: 0.8),
+                        border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade200, width: 0.8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
+                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           )
@@ -477,7 +506,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               width: 52,
                               height: 52,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
+                                color: isDark ? const Color(0xFF0F172A) : Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(Icons.sports_soccer, color: AppTheme.primary, size: 26),
@@ -489,21 +518,21 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                 children: [
                                   Text(
                                     booking.fieldName ?? "Lapangan Futsal",
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppTheme.textPrimary),
                                   ),
                                   const SizedBox(height: 3),
                                   Text(
                                     "Tanggal Pemesanan: ${booking.bookDate}",
-                                    style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                    style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
                                   ),
                                   Text(
                                     "Waktu Sewa: ${booking.timeSlotString}",
-                                    style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                    style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary),
                                   ),
                                   const SizedBox(height: 3),
                                   Text(
                                     "Nama Tim: ${booking.teamName}",
-                                    style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : AppTheme.textPrimary, fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),
@@ -540,12 +569,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFE0F7FA),
+                                      color: const Color(0xFF006064),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: const Text(
                                       "HADIR",
-                                      style: TextStyle(color: Color(0xFF00838F), fontSize: 8, fontWeight: FontWeight.bold),
+                                      style: TextStyle(color: Color(0xFF80DEEA), fontSize: 8, fontWeight: FontWeight.bold),
                                     ),
                                   )
                                 ]
@@ -557,6 +586,254 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     );
                   },
                 ),
+    );
+  }
+
+  Widget _buildSettingsTab(UserModel user, AuthProvider auth, bool isDark) {
+    final themeProv = context.watch<ThemeProvider>();
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      children: [
+        // iOS styled user profile header card
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade100),
+            boxShadow: AppTheme.softShadow(),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5), width: 2.5),
+                ),
+                child: CircleAvatar(
+                  radius: 36,
+                  backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
+                  backgroundImage: NetworkImage(
+                     user.avatar ?? "https://api.dicebear.com/7.x/adventurer/svg?seed=${user.name}",
+                  ),
+                ),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.name,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user.email,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGlow,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        user.role.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppTheme.primary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 30),
+
+        // Grouped iOS style Menu Section 1: Tampilan
+        _buildGroupTitle("TAMPILAN"),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade100),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Column(
+              children: [
+                _buildSettingsTile(
+                  icon: Icons.dark_mode_rounded,
+                  iconBg: const Color(0xFF5856D6), // iOS Purple
+                  title: "Mode Gelap",
+                  trailing: Switch.adaptive(
+                    value: themeProv.isDarkMode,
+                    activeTrackColor: AppTheme.primary,
+                    onChanged: (val) {
+                      themeProv.toggleTheme(val);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // Grouped iOS style Menu Section 2: Informasi
+        _buildGroupTitle("INFORMASI"),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade100),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Column(
+              children: [
+                _buildSettingsTile(
+                  icon: Icons.info_outline_rounded,
+                  iconBg: const Color(0xFF007AFF), // iOS Blue
+                  title: "Tentang Aplikasi",
+                  trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: "Futsal Reserve Tuparev",
+                      applicationVersion: "v1.0.0",
+                      applicationIcon: Image.asset('assets/images/logo.png', width: 48, height: 48),
+                      children: [
+                        const Text("Aplikasi booking lapangan futsal premium dengan fitur notifikasi real-time dan state management canggih."),
+                      ],
+                    );
+                  },
+                ),
+                Divider(color: isDark ? const Color(0xFF334155) : Colors.grey.shade100, height: 1),
+                _buildSettingsTile(
+                  icon: Icons.support_agent_rounded,
+                  iconBg: const Color(0xFF34C759), // iOS Green
+                  title: "Bantuan & Dukungan",
+                  trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Layanan dukungan pelanggan sedang sibuk. Silakan coba beberapa saat lagi.")),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 35),
+
+        // Grouped iOS style Menu Section 3: Logout
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade100),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: _buildSettingsTile(
+              icon: Icons.logout_rounded,
+              iconBg: const Color(0xFFFF3B30), // iOS Red
+              title: "Keluar Akun",
+              trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+              onTap: () async {
+                final navigator = Navigator.of(context);
+                // Confirm dialog
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog.adaptive(
+                    title: const Text("Keluar"),
+                    content: const Text("Apakah Anda yakin ingin keluar dari akun ini?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text("Batal"),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text("Keluar", style: TextStyle(color: AppTheme.accent)),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await auth.logout();
+                  navigator.pushReplacement(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  );
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGroupTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.textSecondary,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile({
+    required IconData icon,
+    required Color iconBg,
+    required String title,
+    required Widget trailing,
+    VoidCallback? onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ListTile(
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: iconBg,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
+          color: isDark ? Colors.white : AppTheme.textPrimary,
+        ),
+      ),
+      trailing: trailing,
     );
   }
 
