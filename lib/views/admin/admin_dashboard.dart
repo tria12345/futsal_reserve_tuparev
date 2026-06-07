@@ -11,6 +11,7 @@ import '../../theme/app_theme.dart';
 import '../login_screen.dart';
 import 'court_maintenance_screen.dart';
 import 'booking_verification_screen.dart';
+import '../help_support_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -702,8 +703,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   title: "Bantuan & Dukungan",
                   trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Layanan dukungan pelanggan sedang sibuk. Silakan coba beberapa saat lagi.")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
                     );
                   },
                 ),
