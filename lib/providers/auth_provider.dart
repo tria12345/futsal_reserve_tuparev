@@ -10,6 +10,7 @@ import '../models/user_model.dart';
 import '../services/socket_service.dart';
 import '../services/fcm_service.dart';
 import '../services/api_service.dart';
+import '../config/app_config.dart';
 
 class AuthProvider extends ChangeNotifier {
   UserModel? _currentUser;
@@ -62,7 +63,7 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       dev.log("Initiating Google Sign-In...");
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn().timeout(const Duration(seconds: 5));
       
       if (googleUser == null) {
         _errorMessage = "Google Sign-In was cancelled.";
@@ -70,9 +71,10 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      dev.log("Google Sign-In success! Fetching auth details...");
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication.timeout(const Duration(seconds: 5));
 
-      dev.log("Google Sign-In success! Email: ${googleUser.email}. Authenticating with Firebase...");
+      dev.log("Google Auth success! Email: ${googleUser.email}. Authenticating with Firebase...");
 
       // ===== FIREBASE AUTH (Modul 14) =====
       // Create Firebase credential from Google tokens
@@ -82,11 +84,12 @@ class AuthProvider extends ChangeNotifier {
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(firebaseCredential);
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(firebaseCredential).timeout(const Duration(seconds: 5));
       
       // Get Firebase ID Token (more secure than raw Google idToken)
-      final String? firebaseIdToken = await userCredential.user!.getIdToken();
-      dev.log("Firebase Auth success! UID: ${userCredential.user!.uid}. Verifying with backend...");
+      dev.log("Firebase Auth success! Fetching Firebase ID token...");
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       // ===== END FIREBASE AUTH =====
 
       // Call PHP Auth Endpoint with Firebase ID Token via ApiService
@@ -100,7 +103,7 @@ class AuthProvider extends ChangeNotifier {
 
       return await _handleBackendAuthResponse(response);
     } catch (e) {
-      _errorMessage = "Authentication failed: $e";
+      _errorMessage = _formatException(e, "Authentication failed");
       dev.log("Auth Exception: $e");
     }
 
@@ -146,9 +149,11 @@ class AuthProvider extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      );
+      ).timeout(const Duration(seconds: 5));
       
-      final String? firebaseIdToken = await userCredential.user!.getIdToken();
+      dev.log("Firebase Email Registration success! Fetching Firebase ID token...");
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       
       final response = await ApiService().login({
         "email": email.trim(),
@@ -169,7 +174,7 @@ class AuthProvider extends ChangeNotifier {
       }
       dev.log("Firebase Auth Exception: $e");
     } catch (e) {
-      _errorMessage = "Registrasi gagal: $e";
+      _errorMessage = _formatException(e, "Registrasi gagal");
       dev.log("Auth Exception: $e");
     }
     
@@ -185,9 +190,11 @@ class AuthProvider extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      );
+      ).timeout(const Duration(seconds: 5));
       
-      final String? firebaseIdToken = await userCredential.user!.getIdToken();
+      dev.log("Firebase Email Sign-In success! Fetching Firebase ID token...");
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       
       final response = await ApiService().login({
         "email": email.trim(),
@@ -207,7 +214,7 @@ class AuthProvider extends ChangeNotifier {
       }
       dev.log("Firebase Auth Exception: $e");
     } catch (e) {
-      _errorMessage = "Login gagal: $e";
+      _errorMessage = _formatException(e, "Login gagal");
       dev.log("Auth Exception: $e");
     }
     
@@ -244,6 +251,16 @@ class AuthProvider extends ChangeNotifier {
 
     _currentUser = null;
     notifyListeners();
+  }
+
+  String _formatException(dynamic e, String prefix) {
+    final errStr = e.toString();
+    if (errStr.contains('TimeoutException')) {
+      return "$prefix: Koneksi timeout (5 detik). Pastikan server backend Anda aktif dan HP terhubung ke Wi-Fi yang sama.";
+    } else if (errStr.contains('SocketException') || errStr.contains('Connection refused') || errStr.contains('Connection timed out')) {
+      return "$prefix: Gagal menghubungi server backend di ${AppConfig.serverIp}. Periksa apakah laptop/PC menyala, XAMPP aktif, dan firewall tidak memblokir port 80.";
+    }
+    return "$prefix: $e";
   }
 
   void _setLoading(bool value) {

@@ -10,6 +10,7 @@ import '../../providers/theme_provider.dart';
 import '../../theme/app_theme.dart';
 import '../login_screen.dart';
 import 'court_detail_screen.dart';
+import '../help_support_screen.dart';
 
 class CustomerDashboard extends StatefulWidget {
   final int initialTab;
@@ -731,8 +732,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   title: "Bantuan & Dukungan",
                   trailing: Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Layanan dukungan pelanggan sedang sibuk. Silakan coba beberapa saat lagi.")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
                     );
                   },
                 ),
