@@ -765,14 +765,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildGroupTitle(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(left: 10, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.textSecondary,
+          color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary,
           letterSpacing: 1.0,
         ),
       ),

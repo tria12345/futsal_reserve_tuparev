@@ -391,13 +391,18 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       Image.network(
-                                        court.imageUrl ?? "https://images.unsplash.com/photo-1577223625856-74552436858d?q=80&w=600",
+                                        court.imageUrl ?? _getFallbackImageUrl(court.name),
                                         height: 140,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (c, e, s) => Container(
+                                        errorBuilder: (c, e, s) => Image.network(
+                                          _getFallbackImageUrl(court.name),
                                           height: 140,
-                                          color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
-                                          child: const Icon(Icons.sports_soccer, size: 48, color: Colors.grey),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (c2, e2, s2) => Container(
+                                            height: 140,
+                                            color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
+                                            child: const Icon(Icons.sports_soccer, size: 48, color: Colors.grey),
+                                          ),
                                         ),
                                       ),
                                       Padding(
@@ -794,18 +799,38 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   }
 
   Widget _buildGroupTitle(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(left: 10, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.textSecondary,
+          color: isDark ? const Color(0xFF94A3B8) : AppTheme.textSecondary,
           letterSpacing: 1.0,
         ),
       ),
     );
+  }
+
+  // Fallback gambar Unsplash unik per lapangan, dipakai jika gambar server gagal
+  String _getFallbackImageUrl(String courtName) {
+    final cleanName = courtName.toLowerCase();
+    if (cleanName.contains('1')) {
+      return 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e?q=80&w=600&fit=crop';
+    } else if (cleanName.contains('2')) {
+      return 'https://images.unsplash.com/photo-1577223625856-74552436858d?q=80&w=600&fit=crop';
+    } else if (cleanName.contains('3')) {
+      return 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=600&fit=crop';
+    } else if (cleanName.contains('4')) {
+      return 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=600&fit=crop';
+    } else if (cleanName.contains('5')) {
+      return 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&fit=crop';
+    } else if (cleanName.contains('6')) {
+      return 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1577223625856-74552436858d?q=80&w=600&fit=crop';
   }
 
   Widget _buildSettingsTile({
