@@ -95121,7 +95121,7 @@ q.U()
 return A.E(null,r)}})
 return A.F($async$q_,r)},
 Hs(a,b){var s=J.ct(a)
-if(B.c.t(s,"TimeoutException"))return b+": Koneksi timeout (5 detik). Pastikan server backend Anda aktif dan HP terhubung ke Wi-Fi yang sama."
+if(B.c.t(s,"TimeoutException"))return b+": Koneksi timeout (15 detik). Pastikan server backend Anda aktif dan HP terhubung ke Wi-Fi yang sama."
 else if(B.c.t(s,"SocketException")||B.c.t(s,"Connection refused")||B.c.t(s,"Connection timed out"))return b+": Gagal menghubungi server backend di localhost. Periksa apakah laptop/PC menyala, XAMPP aktif, dan firewall tidak memblokir port 80."
 return b+": "+A.j(a)}}
 A.pO.prototype={
@@ -104941,6 +104941,7 @@ B.kW=new A.b0(125e3)
 B.Iq=new A.b0(14e4)
 B.Ir=new A.b0(15e3)
 B.pp=new A.b0(15e5)
+B.c9=new A.b0(15e6)
 B.Is=new A.b0(16667)
 B.d4=new A.b0(167e3)
 B.It=new A.b0(18e4)
@@ -104960,7 +104961,6 @@ B.Iz=new A.b0(45e3)
 B.IA=new A.b0(45e4)
 B.kY=new A.b0(5e4)
 B.du=new A.b0(5e5)
-B.c9=new A.b0(5e6)
 B.fv=new A.b0(6e5)
 B.pt=new A.b0(7e4)
 B.IB=new A.b0(-38e3)
