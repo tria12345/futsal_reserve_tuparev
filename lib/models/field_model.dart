@@ -67,16 +67,16 @@ class FieldModel {
       return 'assets/images/lapangan_1.png'; // Vinyl
     }
     if (lowerName.contains('2')) {
-      return 'assets/images/lapangan_3.png'; // Vinyl
+      return 'assets/images/lapangan_2.png'; // Vinyl
     }
     if (lowerName.contains('3')) {
-      return 'assets/images/lapangan_4.png'; // Rumput Sintetis (Soft Turf)
+      return 'assets/images/lapangan_3.png'; // Rumput Sintetis (Soft Turf)
     }
     if (lowerName.contains('4')) {
       return 'assets/images/lapangan_4.png'; // Rumput Sintetis (Soft Turf)
     }
     if (lowerName.contains('5')) {
-      return 'assets/images/lapangan_2.png'; // Interlock Polymer Sport
+      return 'assets/images/lapangan_5.png'; // Interlock Polymer Sport
     }
     if (lowerName.contains('6')) {
       return 'assets/images/lapangan_6.png'; // Interlock Polymer Sport
