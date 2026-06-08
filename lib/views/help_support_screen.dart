@@ -38,27 +38,40 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> with SingleTicker
         backgroundColor: AppTheme.primary,
         elevation: 0,
         foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: const [
-            Tab(icon: Icon(Icons.gavel_rounded), text: "Peraturan"),
-            Tab(icon: Icon(Icons.help_outline_rounded), text: "FAQ"),
-            Tab(icon: Icon(Icons.contact_support_rounded), text: "Hubungi Kami"),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(72),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                indicatorWeight: 3,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                tabs: const [
+                  Tab(icon: Icon(Icons.gavel_rounded), text: "Peraturan"),
+                  Tab(icon: Icon(Icons.help_outline_rounded), text: "FAQ"),
+                  Tab(icon: Icon(Icons.contact_support_rounded), text: "Hubungi Kami"),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildRulesTab(isDark),
-          _buildFaqTab(isDark),
-          _buildContactTab(isDark),
-        ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildRulesTab(isDark),
+              _buildFaqTab(isDark),
+              _buildContactTab(isDark),
+            ],
+          ),
+        ),
       ),
     );
   }
