@@ -15,7 +15,7 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin? _notificationsPlugin = kIsWeb ? null : FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
 
   Future<void> init() async {
@@ -39,7 +39,7 @@ class NotificationService {
       iOS: initializationSettingsDarwin,
     );
 
-    await _notificationsPlugin.initialize(
+    await _notificationsPlugin!.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         // Handle local notification click action
@@ -79,7 +79,7 @@ class NotificationService {
     );
 
     // Request permissions for Android 13+
-    await _notificationsPlugin
+    await _notificationsPlugin!
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
 
@@ -113,7 +113,7 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _notificationsPlugin.show(
+    await _notificationsPlugin!.show(
       id,
       title,
       body,
