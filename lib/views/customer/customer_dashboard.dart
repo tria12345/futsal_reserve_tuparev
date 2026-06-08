@@ -808,24 +808,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
-  // Fallback gambar Unsplash unik per lapangan, dipakai jika gambar server gagal
-  String _getFallbackImageUrl(String courtName) {
-    final cleanName = courtName.toLowerCase();
-    if (cleanName.contains('1')) {
-      return 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e?q=80&w=600&fit=crop';
-    } else if (cleanName.contains('2')) {
-      return 'https://images.unsplash.com/photo-1577223625856-74552436858d?q=80&w=600&fit=crop';
-    } else if (cleanName.contains('3')) {
-      return 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=600&fit=crop';
-    } else if (cleanName.contains('4')) {
-      return 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=600&fit=crop';
-    } else if (cleanName.contains('5')) {
-      return 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=600&fit=crop';
-    } else if (cleanName.contains('6')) {
-      return 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&fit=crop';
-    }
-    return 'https://images.unsplash.com/photo-1577223625856-74552436858d?q=80&w=600&fit=crop';
-  }
+
 
   Widget _buildSettingsTile({
     required IconData icon,
