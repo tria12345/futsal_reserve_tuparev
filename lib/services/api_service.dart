@@ -14,7 +14,7 @@ class ApiService {
       Uri.parse("${AppConfig.baseUrl}/login.php"),
       headers: {"Content-Type": "application/json"},
       body: json.encode(data),
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(const Duration(seconds: 3));
   }
 
   Future<http.Response> getFields({bool isCustomer = false}) async {
