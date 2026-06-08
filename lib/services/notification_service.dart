@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'fcm_service.dart';
@@ -18,6 +19,7 @@ class NotificationService {
   bool _isInitialized = false;
 
   Future<void> init() async {
+    if (kIsWeb) return;
     if (_isInitialized) return;
 
     // Android Initialization settings
@@ -90,6 +92,7 @@ class NotificationService {
     required String body,
     String? payload,
   }) async {
+    if (kIsWeb) return;
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'futsal_reserve_channel',
       'Futsal Reserve Notifications',
