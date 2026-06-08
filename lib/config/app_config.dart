@@ -5,8 +5,8 @@ class AppConfig {
   static const String serverIp = kIsWeb ? "localhost" : "192.168.1.15";
 
   // Base endpoints
-  static const String baseUrl = "http://$serverIp/backend/api";
-  static const String uploadsUrl = "http://$serverIp/backend/";
+  static const String baseUrl = "https://futsaltuparev.cleverapps.io/api";
+  static const String uploadsUrl = "https://futsaltuparev.cleverapps.io/";
   static const String webSocketUrl = "http://$serverIp:3000";
   static const String fcmRegisterUrl =
       "http://$serverIp:3000/api/register-fcm-token";
