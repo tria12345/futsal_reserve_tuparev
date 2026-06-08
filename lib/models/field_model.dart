@@ -60,26 +60,26 @@ class FieldModel {
            lowerName.contains('6');
   }
 
-  /// Maps the court name to its corresponding local asset path
+  /// Maps the court name to its corresponding local asset path based on floor type description
   String get localAssetPath {
     final lowerName = name.toLowerCase();
     if (lowerName.contains('1')) {
-      return 'assets/images/lapangan_1.png';
+      return 'assets/images/lapangan_1.png'; // Vinyl
     }
     if (lowerName.contains('2')) {
-      return 'assets/images/lapangan_2.png';
+      return 'assets/images/lapangan_3.png'; // Vinyl
     }
     if (lowerName.contains('3')) {
-      return 'assets/images/lapangan_3.png';
+      return 'assets/images/lapangan_4.png'; // Rumput Sintetis (Soft Turf)
     }
     if (lowerName.contains('4')) {
-      return 'assets/images/lapangan_4.png';
+      return 'assets/images/lapangan_4.png'; // Rumput Sintetis (Soft Turf)
     }
     if (lowerName.contains('5')) {
-      return 'assets/images/lapangan_5.png';
+      return 'assets/images/lapangan_2.png'; // Interlock Polymer Sport
     }
     if (lowerName.contains('6')) {
-      return 'assets/images/lapangan_6.png';
+      return 'assets/images/lapangan_6.png'; // Interlock Polymer Sport
     }
     return 'assets/images/lapangan_1.png';
   }
