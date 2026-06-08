@@ -74,16 +74,20 @@ class _CourtMaintenanceScreenState extends State<CourtMaintenanceScreen> {
                                       color: AppTheme.primaryGlow,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(color: Colors.grey.shade200, width: 0.8),
-                                      image: court.imageUrl != null
-                                          ? DecorationImage(
-                                              image: NetworkImage(court.imageUrl!),
-                                              fit: BoxFit.cover,
-                                            )
-                                          : null,
                                     ),
-                                    child: court.imageUrl == null
-                                        ? const Icon(Icons.sports_soccer_rounded, color: AppTheme.primary, size: 28)
-                                        : null,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(11),
+                                      child: court.buildImage(
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (c, e, s) => const Icon(
+                                          Icons.sports_soccer_rounded,
+                                          color: AppTheme.primary,
+                                          size: 28,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(width: 16),
                                   

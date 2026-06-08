@@ -390,19 +390,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Image.network(
-                                        court.imageUrl ?? _getFallbackImageUrl(court.name),
+                                      court.buildImage(
                                         height: 140,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (c, e, s) => Image.network(
-                                          _getFallbackImageUrl(court.name),
+                                        errorBuilder: (c, e, s) => Container(
                                           height: 140,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (c2, e2, s2) => Container(
-                                            height: 140,
-                                            color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
-                                            child: const Icon(Icons.sports_soccer, size: 48, color: Colors.grey),
-                                          ),
+                                          color: isDark ? const Color(0xFF334155) : Colors.grey.shade100,
+                                          child: const Icon(Icons.sports_soccer, size: 48, color: Colors.grey),
                                         ),
                                       ),
                                       Padding(

@@ -1,5 +1,6 @@
 // lib/models/field_model.dart
 
+import 'package:flutter/material.dart';
 import '../config/app_config.dart';
 
 class FieldModel {
@@ -46,5 +47,110 @@ class FieldModel {
       'is_maintenance': isMaintenance ? 1 : 0,
       'image_url': imageUrl,
     };
+  }
+
+  /// Checks if the imageUrl matches one of the default court asset files
+  bool get isDefaultImage {
+    if (imageUrl == null) return false;
+    final lowerUrl = imageUrl!.toLowerCase();
+    return lowerUrl.contains('lapangan_1.png') ||
+           lowerUrl.contains('lapangan_2.png') ||
+           lowerUrl.contains('lapangan_3.png') ||
+           lowerUrl.contains('lapangan_4.png') ||
+           lowerUrl.contains('lapangan_5.png') ||
+           lowerUrl.contains('lapangan_6.png');
+  }
+
+  /// Maps the image URL to its corresponding local asset path
+  String get localAssetPath {
+    if (imageUrl == null) return 'assets/images/lapangan_1.png';
+    final lowerUrl = imageUrl!.toLowerCase();
+    if (lowerUrl.contains('lapangan_1.png')) return 'assets/images/lapangan_1.png';
+    if (lowerUrl.contains('lapangan_2.png')) return 'assets/images/lapangan_2.png';
+    if (lowerUrl.contains('lapangan_3.png')) return 'assets/images/lapangan_3.png';
+    if (lowerUrl.contains('lapangan_4.png')) return 'assets/images/lapangan_4.png';
+    if (lowerUrl.contains('lapangan_5.png')) return 'assets/images/lapangan_5.png';
+    if (lowerUrl.contains('lapangan_6.png')) return 'assets/images/lapangan_6.png';
+    return 'assets/images/lapangan_1.png';
+  }
+
+  /// Returns the appropriate ImageProvider (AssetImage for defaults, NetworkImage for others)
+  ImageProvider get imageProvider {
+    if (isDefaultImage) {
+      return AssetImage(localAssetPath);
+    }
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return NetworkImage(imageUrl!);
+    }
+    // Fallback based on court name if imageUrl is null or empty
+    final lowerName = name.toLowerCase();
+    if (lowerName.contains('1')) return const AssetImage('assets/images/lapangan_1.png');
+    if (lowerName.contains('2')) return const AssetImage('assets/images/lapangan_2.png');
+    if (lowerName.contains('3')) return const AssetImage('assets/images/lapangan_3.png');
+    if (lowerName.contains('4')) return const AssetImage('assets/images/lapangan_4.png');
+    if (lowerName.contains('5')) return const AssetImage('assets/images/lapangan_5.png');
+    if (lowerName.contains('6')) return const AssetImage('assets/images/lapangan_6.png');
+    return const AssetImage('assets/images/lapangan_1.png');
+  }
+
+  /// Builds a responsive Image widget for the court with automated local asset fallbacks
+  Widget buildImage({
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+    Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
+  }) {
+    if (isDefaultImage) {
+      return Image.asset(
+        localAssetPath,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: errorBuilder ?? (context, error, stackTrace) {
+          // Fallback to asset based on name if the specific asset fails to load
+          final lowerName = name.toLowerCase();
+          String asset = 'assets/images/lapangan_1.png';
+          if (lowerName.contains('2')) asset = 'assets/images/lapangan_2.png';
+          else if (lowerName.contains('3')) asset = 'assets/images/lapangan_3.png';
+          else if (lowerName.contains('4')) asset = 'assets/images/lapangan_4.png';
+          else if (lowerName.contains('5')) asset = 'assets/images/lapangan_5.png';
+          else if (lowerName.contains('6')) asset = 'assets/images/lapangan_6.png';
+          return Image.asset(asset, width: width, height: height, fit: fit);
+        },
+      );
+    }
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return Image.network(
+        imageUrl!,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: errorBuilder ?? (context, error, stackTrace) {
+          // Fallback to asset based on name when network image fails
+          final lowerName = name.toLowerCase();
+          String asset = 'assets/images/lapangan_1.png';
+          if (lowerName.contains('2')) asset = 'assets/images/lapangan_2.png';
+          else if (lowerName.contains('3')) asset = 'assets/images/lapangan_3.png';
+          else if (lowerName.contains('4')) asset = 'assets/images/lapangan_4.png';
+          else if (lowerName.contains('5')) asset = 'assets/images/lapangan_5.png';
+          else if (lowerName.contains('6')) asset = 'assets/images/lapangan_6.png';
+          return Image.asset(asset, width: width, height: height, fit: fit);
+        },
+      );
+    }
+    // Fallback if imageUrl is null or empty
+    final lowerName = name.toLowerCase();
+    String asset = 'assets/images/lapangan_1.png';
+    if (lowerName.contains('2')) asset = 'assets/images/lapangan_2.png';
+    else if (lowerName.contains('3')) asset = 'assets/images/lapangan_3.png';
+    else if (lowerName.contains('4')) asset = 'assets/images/lapangan_4.png';
+    else if (lowerName.contains('5')) asset = 'assets/images/lapangan_5.png';
+    else if (lowerName.contains('6')) asset = 'assets/images/lapangan_6.png';
+    return Image.asset(
+      asset,
+      width: width,
+      height: height,
+      fit: fit,
+    );
   }
 }

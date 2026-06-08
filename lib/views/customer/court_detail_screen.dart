@@ -263,19 +263,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         ),
                       ],
                     ),
-                    child: Image.network(
-                      widget.field.imageUrl ?? _getFallbackImageUrl(widget.field.name),
+                    child: widget.field.buildImage(
                       height: 220,
                       fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => Image.network(
-                        _getFallbackImageUrl(widget.field.name),
+                      errorBuilder: (c, e, s) => Container(
                         height: 220,
-                        fit: BoxFit.cover,
-                        errorBuilder: (c2, e2, s2) => Container(
-                          height: 220,
-                          color: Colors.grey.shade200,
-                          child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
-                        ),
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
                       ),
                     ),
                   ),
