@@ -74,7 +74,7 @@ class AuthProvider extends ChangeNotifier {
         return await _handleBackendAuthResponse(response);
       }
       dev.log("Initiating Google Sign-In...");
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn().timeout(const Duration(seconds: 5));
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn().timeout(const Duration(seconds: 15));
       
       if (googleUser == null) {
         _errorMessage = "Google Sign-In was cancelled.";
@@ -83,7 +83,7 @@ class AuthProvider extends ChangeNotifier {
       }
 
       dev.log("Google Sign-In success! Fetching auth details...");
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication.timeout(const Duration(seconds: 5));
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication.timeout(const Duration(seconds: 15));
 
       dev.log("Google Auth success! Email: ${googleUser.email}. Authenticating with Firebase...");
 
@@ -95,11 +95,11 @@ class AuthProvider extends ChangeNotifier {
       );
 
       // Sign in to Firebase with the Google credential
-      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(firebaseCredential).timeout(const Duration(seconds: 5));
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(firebaseCredential).timeout(const Duration(seconds: 15));
       
       // Get Firebase ID Token (more secure than raw Google idToken)
       dev.log("Firebase Auth success! Fetching Firebase ID token...");
-      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 15));
       dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       // ===== END FIREBASE AUTH =====
 
@@ -170,10 +170,10 @@ class AuthProvider extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 15));
       
       dev.log("Firebase Email Registration success! Fetching Firebase ID token...");
-      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 15));
       dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       
       final response = await ApiService().login({
@@ -220,10 +220,10 @@ class AuthProvider extends ChangeNotifier {
       final UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
-      ).timeout(const Duration(seconds: 5));
+      ).timeout(const Duration(seconds: 15));
       
       dev.log("Firebase Email Sign-In success! Fetching Firebase ID token...");
-      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 5));
+      final String? firebaseIdToken = await userCredential.user!.getIdToken().timeout(const Duration(seconds: 15));
       dev.log("Firebase ID token received. Verifying with backend at ${AppConfig.baseUrl}...");
       
       final response = await ApiService().login({
@@ -288,7 +288,7 @@ class AuthProvider extends ChangeNotifier {
   String _formatException(dynamic e, String prefix) {
     final errStr = e.toString();
     if (errStr.contains('TimeoutException')) {
-      return "$prefix: Koneksi timeout (5 detik). Pastikan server backend Anda aktif dan HP terhubung ke Wi-Fi yang sama.";
+      return "$prefix: Koneksi timeout (15 detik). Pastikan server backend Anda aktif dan HP terhubung ke Wi-Fi yang sama.";
     } else if (errStr.contains('SocketException') || errStr.contains('Connection refused') || errStr.contains('Connection timed out')) {
       return "$prefix: Gagal menghubungi server backend di ${AppConfig.serverIp}. Periksa apakah laptop/PC menyala, XAMPP aktif, dan firewall tidak memblokir port 80.";
     }
