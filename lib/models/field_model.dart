@@ -49,42 +49,36 @@ class FieldModel {
     };
   }
 
-  /// Checks if the imageUrl matches one of the default court asset files
+  /// Checks if the court is one of the default fields (Lapangan 1 to 6) to load from local assets
   bool get isDefaultImage {
-    if (imageUrl == null) {
-      return false;
-    }
-    final lowerUrl = imageUrl!.toLowerCase();
-    return lowerUrl.contains('lapangan_1.png') ||
-           lowerUrl.contains('lapangan_2.png') ||
-           lowerUrl.contains('lapangan_3.png') ||
-           lowerUrl.contains('lapangan_4.png') ||
-           lowerUrl.contains('lapangan_5.png') ||
-           lowerUrl.contains('lapangan_6.png');
+    final lowerName = name.toLowerCase();
+    return lowerName.contains('1') ||
+           lowerName.contains('2') ||
+           lowerName.contains('3') ||
+           lowerName.contains('4') ||
+           lowerName.contains('5') ||
+           lowerName.contains('6');
   }
 
-  /// Maps the image URL to its corresponding local asset path
+  /// Maps the court name to its corresponding local asset path
   String get localAssetPath {
-    if (imageUrl == null) {
+    final lowerName = name.toLowerCase();
+    if (lowerName.contains('1')) {
       return 'assets/images/lapangan_1.png';
     }
-    final lowerUrl = imageUrl!.toLowerCase();
-    if (lowerUrl.contains('lapangan_1.png')) {
-      return 'assets/images/lapangan_1.png';
-    }
-    if (lowerUrl.contains('lapangan_2.png')) {
+    if (lowerName.contains('2')) {
       return 'assets/images/lapangan_2.png';
     }
-    if (lowerUrl.contains('lapangan_3.png')) {
+    if (lowerName.contains('3')) {
       return 'assets/images/lapangan_3.png';
     }
-    if (lowerUrl.contains('lapangan_4.png')) {
+    if (lowerName.contains('4')) {
       return 'assets/images/lapangan_4.png';
     }
-    if (lowerUrl.contains('lapangan_5.png')) {
+    if (lowerName.contains('5')) {
       return 'assets/images/lapangan_5.png';
     }
-    if (lowerUrl.contains('lapangan_6.png')) {
+    if (lowerName.contains('6')) {
       return 'assets/images/lapangan_6.png';
     }
     return 'assets/images/lapangan_1.png';
