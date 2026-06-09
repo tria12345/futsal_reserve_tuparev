@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../models/field_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booking_provider.dart';
+import '../../services/notification_service.dart';
 import '../../theme/app_theme.dart';
 import 'customer_dashboard.dart';
 
@@ -157,6 +158,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     if (overallSuccess && mounted) {
+      await NotificationService().showNotification(
+        id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        title: "Transaksi Berhasil Dikirim",
+        body: "Booking ${_teamController.text.trim()} sedang menunggu verifikasi admin.",
+        payload: "booking_submitted",
+      );
+
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Pengajuan sewa dikirim! Menunggu verifikasi Admin."),

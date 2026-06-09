@@ -93,6 +93,11 @@ class NotificationService {
     String? payload,
   }) async {
     if (kIsWeb) return;
+
+    if (!_isInitialized) {
+      await init();
+    }
+
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'futsal_reserve_channel',
       'Futsal Reserve Notifications',
